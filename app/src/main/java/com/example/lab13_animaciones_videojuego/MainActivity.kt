@@ -99,12 +99,10 @@ fun AnimatedColorBoxDemo(modifier: Modifier = Modifier) {
 
 @Composable
 fun AnimatedSizePositionDemo(modifier: Modifier = Modifier) {
-    var expanded by remember { mutableStateOf(false) }
-    var moved by remember { mutableStateOf(false) }
-    var offsetFirst by remember { mutableStateOf(false) }
-    val sizeTarget = if (expanded) 180.dp else 100.dp
-    val xTarget = if (moved) 80.dp else 0.dp
-    val yTarget = if (moved) 40.dp else 0.dp
+    var toggled by remember { mutableStateOf(false) }
+    val sizeTarget = if (toggled) 180.dp else 100.dp
+    val xTarget = if (toggled) 80.dp else 0.dp
+    val yTarget = if (toggled) 40.dp else 0.dp
     val size by animateDpAsState(targetValue = sizeTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "size")
     val x by animateDpAsState(targetValue = xTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "x")
     val y by animateDpAsState(targetValue = yTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "y")
@@ -114,23 +112,12 @@ fun AnimatedSizePositionDemo(modifier: Modifier = Modifier) {
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Button(onClick = { expanded = !expanded }) { Text(text = if (expanded) "Reducir" else "Expandir") }
-            Button(onClick = { moved = !moved }) { Text(text = if (moved) "Reiniciar" else "Mover") }
-            Button(onClick = { offsetFirst = !offsetFirst }) { Text(text = if (offsetFirst) "Offset→Size" else "Size→Offset") }
-        }
+        Button(onClick = { toggled = !toggled }) { Text(text = if (toggled) "Reiniciar" else "Mover y Expandir") }
         Spacer(Modifier.height(16.dp))
-        val boxModifier = if (offsetFirst) {
-            Modifier
-                .offset(x = x, y = y)
-                .size(size)
-        } else {
-            Modifier
-                .size(size)
-                .offset(x = x, y = y)
-        }
         Box(
-            modifier = boxModifier
+            modifier = Modifier
+                .size(size)
+                .offset(x = x, y = y)
                 .background(Color(0xFFFF9800), RoundedCornerShape(16.dp))
         )
     }
