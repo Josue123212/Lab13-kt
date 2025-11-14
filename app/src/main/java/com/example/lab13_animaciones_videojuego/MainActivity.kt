@@ -74,7 +74,7 @@ fun AnimatedColorBoxDemo(modifier: Modifier = Modifier) {
     var isGreen by remember { mutableStateOf(false) }
     var useSpring by remember { mutableStateOf(false) }
     val targetColor = if (isGreen) Color(0xFF4CAF50) else Color(0xFF2196F3)
-    val spec = if (useSpring) spring(dampingRatio = 0.6f, stiffness = 300f) else tween(durationMillis = 600)
+    val spec = if (useSpring) spring<Color>(dampingRatio = 0.6f, stiffness = 300f) else tween<Color>(durationMillis = 600)
     val animatedColor by animateColorAsState(targetValue = targetColor, animationSpec = spec, label = "boxColor")
     Column(
         modifier = modifier
