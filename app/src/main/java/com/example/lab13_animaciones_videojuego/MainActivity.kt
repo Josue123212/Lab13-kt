@@ -5,8 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13AnimacionesVideojuegoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AnimatedVisibilityDemo(modifier = Modifier.padding(innerPadding))
+                    AnimatedColorBoxDemo(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -66,10 +69,44 @@ fun AnimatedVisibilityDemo(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun AnimatedColorBoxDemo(modifier: Modifier = Modifier) {
+    var isGreen by remember { mutableStateOf(false) }
+    var useSpring by remember { mutableStateOf(false) }
+    val targetColor = if (isGreen) Color(0xFF4CAF50) else Color(0xFF2196F3)
+    val spec = if (useSpring) spring(dampingRatio = 0.6f, stiffness = 300f) else tween(durationMillis = 600)
+    val animatedColor by animateColorAsState(targetValue = targetColor, animationSpec = spec, label = "boxColor")
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(onClick = { isGreen = !isGreen }) { Text(text = if (isGreen) "Azul" else "Verde") }
+            Button(onClick = { useSpring = !useSpring }) { Text(text = if (useSpring) "Spring" else "Tween") }
+        }
+        Spacer(Modifier.height(16.dp))
+        Box(
+            modifier = Modifier
+                .size(160.dp)
+                .background(animatedColor, RoundedCornerShape(16.dp))
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AnimatedVisibilityPreview() {
     Lab13AnimacionesVideojuegoTheme {
         AnimatedVisibilityDemo()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnimatedColorBoxPreview() {
+    Lab13AnimacionesVideojuegoTheme {
+        AnimatedColorBoxDemo()
     }
 }
