@@ -7,6 +7,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.togetherWith
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.spring
@@ -15,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +40,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13AnimacionesVideojuegoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AnimatedSizePositionDemo(modifier = Modifier.padding(innerPadding))
+                    AnimatedContentDemo(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -123,6 +126,43 @@ fun AnimatedSizePositionDemo(modifier: Modifier = Modifier) {
     }
 }
 
+enum class UiState { Loading, Content, Error }
+
+@Composable
+fun AnimatedContentDemo(modifier: Modifier = Modifier) {
+    var state by remember { mutableStateOf(UiState.Loading) }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Button(onClick = {
+            state = when (state) {
+                UiState.Loading -> UiState.Content
+                UiState.Content -> UiState.Error
+                UiState.Error -> UiState.Loading
+            }
+        }) { Text("Cambiar estado") }
+        Spacer(Modifier.height(16.dp))
+        AnimatedContent(
+            targetState = state,
+            transitionSpec = { fadeIn(animationSpec = tween(350)) togetherWith fadeOut(animationSpec = tween(250)) },
+            label = "animatedContent"
+        ) { s ->
+            when (s) {
+                UiState.Loading -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(8.dp))
+                    Text("Cargando...")
+                }
+                UiState.Content -> Text("Contenido listo")
+                UiState.Error -> Text("Ocurrió un error")
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AnimatedVisibilityPreview() {
@@ -144,5 +184,13 @@ fun AnimatedColorBoxPreview() {
 fun AnimatedSizePositionPreview() {
     Lab13AnimacionesVideojuegoTheme {
         AnimatedSizePositionDemo()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnimatedContentPreview() {
+    Lab13AnimacionesVideojuegoTheme {
+        AnimatedContentDemo()
     }
 }
