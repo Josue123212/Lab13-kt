@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.spring
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.Dp
 import com.example.lab13_animaciones_videojuego.ui.theme.Lab13AnimacionesVideojuegoTheme
 
 class MainActivity : ComponentActivity() {
@@ -35,7 +37,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Lab13AnimacionesVideojuegoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AnimatedColorBoxDemo(modifier = Modifier.padding(innerPadding))
+                    AnimatedSizePositionDemo(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -74,7 +76,7 @@ fun AnimatedColorBoxDemo(modifier: Modifier = Modifier) {
     var isGreen by remember { mutableStateOf(false) }
     var useSpring by remember { mutableStateOf(false) }
     val targetColor = if (isGreen) Color(0xFF4CAF50) else Color(0xFF2196F3)
-    val spec = if (useSpring) spring<Color>(dampingRatio = 0.6f, stiffness = 300f) else tween<Color>(durationMillis = 600)
+    val spec = if (useSpring) spring<Color>(dampingRatio = 0.6f, stiffness = 300f) else tween<Color>(durationMillis = 1000)
     val animatedColor by animateColorAsState(targetValue = targetColor, animationSpec = spec, label = "boxColor")
     Column(
         modifier = modifier
@@ -95,6 +97,45 @@ fun AnimatedColorBoxDemo(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun AnimatedSizePositionDemo(modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    var moved by remember { mutableStateOf(false) }
+    var offsetFirst by remember { mutableStateOf(false) }
+    val sizeTarget = if (expanded) 180.dp else 100.dp
+    val xTarget = if (moved) 80.dp else 0.dp
+    val yTarget = if (moved) 40.dp else 0.dp
+    val size by animateDpAsState(targetValue = sizeTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "size")
+    val x by animateDpAsState(targetValue = xTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "x")
+    val y by animateDpAsState(targetValue = yTarget, animationSpec = tween<Dp>(durationMillis = 500), label = "y")
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Button(onClick = { expanded = !expanded }) { Text(text = if (expanded) "Reducir" else "Expandir") }
+            Button(onClick = { moved = !moved }) { Text(text = if (moved) "Reiniciar" else "Mover") }
+            Button(onClick = { offsetFirst = !offsetFirst }) { Text(text = if (offsetFirst) "Offset→Size" else "Size→Offset") }
+        }
+        Spacer(Modifier.height(16.dp))
+        val boxModifier = if (offsetFirst) {
+            Modifier
+                .offset(x = x, y = y)
+                .size(size)
+        } else {
+            Modifier
+                .size(size)
+                .offset(x = x, y = y)
+        }
+        Box(
+            modifier = boxModifier
+                .background(Color(0xFFFF9800), RoundedCornerShape(16.dp))
+        )
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun AnimatedVisibilityPreview() {
@@ -108,5 +149,13 @@ fun AnimatedVisibilityPreview() {
 fun AnimatedColorBoxPreview() {
     Lab13AnimacionesVideojuegoTheme {
         AnimatedColorBoxDemo()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AnimatedSizePositionPreview() {
+    Lab13AnimacionesVideojuegoTheme {
+        AnimatedSizePositionDemo()
     }
 }
